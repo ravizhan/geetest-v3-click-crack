@@ -20,6 +20,10 @@ pip install -r requirements.txt
 python main.py
 ```
 
+验证全过程耗时4s左右 (极验限制，不能更短)
+
+成功率80%左右
+
 # DEMO
 
 ``` python
