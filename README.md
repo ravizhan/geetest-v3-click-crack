@@ -34,21 +34,24 @@ model = Model()
 crack.gettype()
 crack.get_c_s()
 crack.ajax()
-pic_content = crack.get_pic()
-# 检测文字位置
-small_img, big_img = model.detect(pic_content)
-# 判断点选顺序
-result_list = model.siamese(small_img, big_img)
-point_list = []
-for i in result_list:
-    left = str(round((i[0] + 30) / 333 * 10000))
-    top = str(round((i[1] + 30) / 333 * 10000))
-    point_list.append(f"{left}_{top}")
-# 验证请求
-# 注意 请求此函数时请确保全过程时间大于等于4s
-# 否则会报 duration short
-result = crack.verify(point_list)
-print(result)
+for retry in range(6):
+    pic_content = crack.get_pic(retry)
+    # 检测文字位置
+    small_img, big_img = model.detect(pic_content)
+    # 判断点选顺序
+    result_list = model.siamese(small_img, big_img)
+    point_list = []
+    for i in result_list:
+        left = str(round((i[0] + 30) / 333 * 10000))
+        top = str(round((i[1] + 30) / 333 * 10000))
+        point_list.append(f"{left}_{top}")
+    # 验证请求
+    # 注意 请确保验证与获取图片间隔不小于2s
+    # 否则会报 duration short
+    result = crack.verify(point_list)
+    print(result)
+    if eval(result)["data"]["result"] == "success":
+        break
 ```
 
 # 协议

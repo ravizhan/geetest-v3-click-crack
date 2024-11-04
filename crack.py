@@ -417,27 +417,35 @@ Bm1Zzu+l8nSOqAurgQIDAQAB
         resp = self.session.get("https://api.geetest.com/ajax.php", params=params).text
         return json.loads(resp[22:-1])["data"]
 
-    def get_pic(self):
+    def get_pic(self,retry=0):
         params = {
-            "is_next": "true",
             "type": "click",
             "gt": self.gt,
             "challenge": self.challenge,
             "lang": "zh-cn",
-            "https": "true",
-            "protocol": "https://",
-            "offline": "false",
-            "product": "float",
-            "api_server": "api.geevisit.com",
-            "isPC": True,
-            "autoReset": True,
-            "width": "100%",
             "callback": "geetest_" + str(int(round(time.time() * 1000))),
         }
-        resp = self.session.get("https://api.geevisit.com/get.php", params=params).text
+        if retry == 0:
+            url = "https://api.geevisit.com/get.php"
+            params.update(
+                {
+                    "is_next": "true",
+                    "https": "true",
+                    "protocol": "https://",
+                    "offline": "false",
+                    "product": "float",
+                    "api_server": "api.geevisit.com",
+                    "isPC": True,
+                    "autoReset": True,
+                    "width": "100%",
+                }
+            )
+        else:
+            url = "https://api.geetest.com/refresh.php"
+        resp = self.session.get(url, params=params).text
         data = json.loads(resp[22:-1])["data"]
         self.pic_path = data["pic"]
-        pic_url = "https://" + data["resource_servers"][0][:-1] + data["pic"]
+        pic_url = "https://" + data["image_servers"][0][:-1] + data["pic"]
         return self.session.get(pic_url).content
 
     def verify(self, points: list):
